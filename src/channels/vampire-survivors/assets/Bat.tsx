@@ -1,27 +1,32 @@
 import styled from '@emotion/styled';
-import guySprite from './guy.png';
+import batSprite from './bat.png';
 import { useEffect, useState } from 'react';
 
-interface GuyContainerProps {
+interface BatContainerProps {
     sprite: string;
     frameX: number;
     left?: string;
     top?: string;
 }
 
-const GuyContainer = styled.div<GuyContainerProps>`
+const BatContainer = styled.div<BatContainerProps>`
     position: absolute;
     left: ${props => props.left || '45%'};
     top: ${props => props.top || '35%'};
-    width: 101px;
-    height: 104px;
+    width: 80px;
+    height: 80px;
     background-image: url(${props => props.sprite});
     background-repeat: no-repeat;
     overflow: hidden;
-    background-position: ${props => `-${props.frameX * 101}px 0`};
+    background-position: ${props => `-${props.frameX * 80}px 0`};
 `;
 
-function Guy() {
+interface BatProps {
+  left?: string;
+  top?: string;
+}
+
+function Bat({ left, top }: BatProps) {
     const [frame, setFrame] = useState(0);
 
     useEffect(() => {
@@ -33,8 +38,8 @@ function Guy() {
     }, []);
 
     return (
-        <GuyContainer sprite={guySprite} frameX={frame} />
+        <BatContainer sprite={batSprite} frameX={frame} left={left} top={top} />
     );
 }
 
-export default Guy;
+export default Bat;
