@@ -12,6 +12,7 @@ import TweenNumber from '@gdq/lib/components/TweenNumber';
 import background from './background.png';
 
 import Guy from './assets/Guy';
+import Bat from './assets/Bat';
 import Coin from './assets/Coin';
 import { useEffect, useState } from 'react';
 
@@ -47,6 +48,9 @@ function VampireSurvivors(props: ChannelProps) {
 			</TotalEl>
 
 			<Guy></Guy>
+
+			<Bat left={'100px'} top={'200px'}></Bat>
+			<Bat left={'200px'} top={'100px'}></Bat>
 			
 			<TotalCoin index={0}></TotalCoin>
 		</Container>
@@ -69,13 +73,13 @@ const Container = styled.div<ContainerProps>`
 
 const TotalEl = styled.div`
 	font-family: gdqpixel;
-	font-size: 32px;
+	font-size: 24px;
 	color: white;
 
 	position: absolute;
 
 	right: 64px;
-	top: 12px;
+	top: 16px;
 `;
 
 const TotalCoin = styled(Coin)`
