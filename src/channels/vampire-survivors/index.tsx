@@ -13,6 +13,7 @@ import background from './background.png';
 
 import Guy from './assets/Guy';
 import Coin from './assets/Coin';
+import { useEffect, useState } from 'react';
 
 registerChannel('VampireSurvivors', 23, VampireSurvivors, {
 	position: 'bottomLeft',
@@ -23,31 +24,45 @@ registerChannel('VampireSurvivors', 23, VampireSurvivors, {
 function VampireSurvivors(props: ChannelProps) {
 	const [total] = useReplicant<Total | null>('total', null);
 
+	const [bgOffset, setBgOffset] = useState(0);
+
 	useListenFor('donation', (donation: FormattedDonation) => {
 		/**
 		 * Respond to a donation.
 		 */
 	});
 
+	useEffect(() => {
+		const interval = setInterval(() => {
+			setBgOffset((prevOffset) => (prevOffset - 4) % 1092);
+		}, 1000 / 30);
+
+		return () => clearInterval(interval);
+	}, []);
+
 	return (
-		<Container>
+		<Container posX={bgOffset}>
 			<TotalEl>
 				<TweenNumber value={Math.floor(total?.raw ?? 0)} />
 			</TotalEl>
 
-			<Guy frameX={0}></Guy>
+			<Guy></Guy>
 			
 			<TotalCoin index={0}></TotalCoin>
 		</Container>
 	);
 }
 
-const Container = styled.div`
+interface ContainerProps {
+	posX: number;
+}
+
+const Container = styled.div<ContainerProps>`
 	position: absolute;
 	width: 100%;
 	height: 100%;
 	background: url('${background}');
-	background-position: 0 0;
+	background-position: ${(props) => `${props.posX}px 0`};
 	padding: 0;
 	margin: 0;
 `;
