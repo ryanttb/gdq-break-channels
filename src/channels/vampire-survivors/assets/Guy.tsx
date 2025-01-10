@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import guySprite from './guy.png';
+import { useEffect, useState } from 'react';
 
 interface GuyContainerProps {
   sprite: string;
@@ -8,8 +9,8 @@ interface GuyContainerProps {
 
 const GuyContainer = styled.div<GuyContainerProps>`
   position: absolute;
-  left: 50%;
-  top: 50%;
+  left: 45%;
+  top: 35%;
   width: 101px;
   height: 104px;
   background-image: url(${props => props.sprite});
@@ -18,10 +19,20 @@ const GuyContainer = styled.div<GuyContainerProps>`
   background-position: ${props => `-${props.frameX * 101}px 0`};
 `;
 
-function Guy({ frameX = 0 }) {
-  return (
-    <GuyContainer sprite={guySprite} frameX={frameX} />
-  );
+function Guy() {
+    const [frame, setFrame] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setFrame(prevFrame => (prevFrame + 1) % 2);
+        }, 1000 / 2);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <GuyContainer sprite={guySprite} frameX={frame} />
+    );
 }
 
 export default Guy;
