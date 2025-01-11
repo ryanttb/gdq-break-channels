@@ -42,4 +42,6 @@ function Bat({ left, top }: BatProps) {
     );
 }
 
+export { BatProps };
+
 export default Bat;
