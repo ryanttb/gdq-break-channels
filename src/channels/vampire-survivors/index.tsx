@@ -12,11 +12,11 @@ import TweenNumber from '@gdq/lib/components/TweenNumber';
 import background from './background.png';
 
 import Guy from './assets/Guy';
-import Bat from './assets/Bat';
+import Bat, { type BatProps } from './assets/Bat';
 import Coin from './assets/Coin';
 import { useEffect, useState } from 'react';
 
-registerChannel('VampireSurvivors', 23, VampireSurvivors, {
+registerChannel('Vampire Survivors', 23, VampireSurvivors, {
 	position: 'bottomLeft',
 	site: 'GitHub',
 	handle: 'example',
@@ -27,19 +27,57 @@ function VampireSurvivors(props: ChannelProps) {
 
 	const [bgOffset, setBgOffset] = useState(0);
 
+	const [batProps, setBatProps] = useState<BatProps[]>([]);
+
 	useListenFor('donation', (donation: FormattedDonation) => {
-		/**
-		 * Respond to a donation.
-		 */
+		const maxLeft = (1092 / 2) - 160;
+		const maxTop = 332;
+
+		const middleTop = 128;
+
+		let leftValue = Math.floor(Math.random() * (maxLeft + 1));
+		let topValue = Math.floor(Math.random() * (maxTop + 1));
+
+		if (topValue < middleTop) {
+			topValue -= middleTop;
+		} else {
+			topValue += middleTop;
+		}
+
+		const left = leftValue + 'px';
+		const top = topValue + 'px';
+
+		setBatProps((prevProps) => [...prevProps, { left, top }]);
 	});
 
 	useEffect(() => {
 		const interval = setInterval(() => {
 			setBgOffset((prevOffset) => (prevOffset - 4) % 1092);
+
+			setBatProps((prevBatProps) =>
+				prevBatProps.map((bat) => {
+					const middleTop = 128;
+					// Parse the current top from "###px" to a number
+					const currentTop = parseInt(bat.top ?? '0', 10);
+					// Move 1 pixel closer to the vertical center at 166
+					// You can tweak the 1-pixel step, or use a fraction to ease in, etc.
+					let newTop: number;
+					if (currentTop < middleTop + 20 && currentTop > middleTop - 20) {
+						newTop = currentTop; // already at pseduo-center
+					} else if (currentTop < middleTop) {
+						newTop = currentTop + 2; // move down
+					} else if (currentTop > middleTop) {
+						newTop = currentTop - 2; // move up
+					} else {
+						newTop = currentTop; // already at center
+					}
+					return { ...bat, top: `${newTop}px` };
+				})
+			  );
 		}, 1000 / 30);
 
 		return () => clearInterval(interval);
-	}, []);
+	}, [setBgOffset]);
 
 	return (
 		<Container posX={bgOffset}>
@@ -49,8 +87,9 @@ function VampireSurvivors(props: ChannelProps) {
 
 			<Guy></Guy>
 
-			<Bat left={'100px'} top={'200px'}></Bat>
-			<Bat left={'200px'} top={'100px'}></Bat>
+			{batProps.map((props, index) => (
+				<Bat key={index} {...props}></Bat>
+			))}
 			
 			<TotalCoin index={0}></TotalCoin>
 		</Container>
@@ -67,6 +106,7 @@ const Container = styled.div<ContainerProps>`
 	height: 100%;
 	background: url('${background}');
 	background-position: ${(props) => `${props.posX}px 0`};
+	overflow: hidden;
 	padding: 0;
 	margin: 0;
 `;
