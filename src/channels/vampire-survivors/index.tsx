@@ -88,41 +88,24 @@ function VampireSurvivors(props: ChannelProps) {
 			  setCoinProps((prevCoinProps) => {
 				return prevCoinProps.map((coin) => {
 					const middleLeft = 682;
-					// Parse the current left from "###px" to a number
-					const currentLeft = parseInt(coin.left ?? '0', 10);
-					// Move 1 pixel closer to the horizontal center at 546
-					// You can tweak the 1-pixel step, or use a fraction to ease in, etc.
-					let newLeft: number;
-					if (currentLeft < middleLeft + 12 && currentLeft > middleLeft - 12) {
-						newLeft = currentLeft; // already at pseduo-center
-					} else if (currentLeft < middleLeft) {
-						newLeft = currentLeft + 5; // move right
-					} else if (currentLeft > middleLeft) {
-						newLeft = currentLeft - 5; // move left
-					} else {
-						newLeft = currentLeft; // already at center
-					}
-
 					const middleTop = 128;
-					// Parse the current top from "###px" to a number
-					const currentTop = parseInt(coin.top ?? '0', 10);
-					// Move 1 pixel closer to the vertical center at 166
-					// You can tweak the 1-pixel step, or use a fraction to ease in, etc.
-					let newTop: number;
-					if (currentTop < middleTop + 12 && currentTop > middleTop - 12) {
-						newTop = currentTop; // already at pseduo-center
-					} else if (currentTop < middleTop) {
-						newTop = currentTop + 5; // move down
-					} else if (currentTop > middleTop) {
-						newTop = currentTop - 5; // move up
-					} else {
-						newTop = currentTop; // already at center
-					}
 
-					let collected = false;
-					if (newLeft === currentLeft && newTop === currentTop) {
-						collected = true;
-					}
+					// Current positions
+					const currentLeft = parseInt(coin.left ?? '0', 10);
+					const currentTop = parseInt(coin.top ?? '0', 10);
+
+					// Distance from coin to Guy
+					const dx = middleLeft - currentLeft;
+					const dy = middleTop - currentTop;
+
+					const fraction = 0.1;
+
+					const newLeft = currentLeft + dx * fraction;
+					const newTop = currentTop + dy * fraction;
+
+					// If distance is less than 20 pixels, mark as collected
+					const distance = Math.sqrt(dx * dx + dy * dy);
+					const collected = distance < 20;
 
 					return { ...coin, left: `${newLeft}px`, top: `${newTop}px`, collected: collected };
 				})
