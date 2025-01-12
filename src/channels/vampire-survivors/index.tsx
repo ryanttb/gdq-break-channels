@@ -13,7 +13,7 @@ import background from './background.png';
 
 import Guy from './assets/Guy';
 import Bat, { type BatProps } from './assets/Bat';
-import Coin from './assets/Coin';
+import Coin, {type CoinProps } from './assets/Coin';
 import { useEffect, useState } from 'react';
 
 registerChannel('Vampire Survivors', 23, VampireSurvivors, {
@@ -29,8 +29,10 @@ function VampireSurvivors(props: ChannelProps) {
 
 	const [batProps, setBatProps] = useState<BatProps[]>([]);
 
+	const [coinProps, setCoinProps] = useState<CoinProps[]>([]);
+
 	useListenFor('donation', (donation: FormattedDonation) => {
-		const maxLeft = (1092 / 2) - 160;
+		const maxLeft = 1092;
 		const maxTop = 332;
 
 		const middleTop = 128;
@@ -47,7 +49,15 @@ function VampireSurvivors(props: ChannelProps) {
 		const left = leftValue + 'px';
 		const top = topValue + 'px';
 
-		setBatProps((prevProps) => [...prevProps, { left, top }]);
+		//setBatProps((prevProps) => [...prevProps, { left, top }]);
+		let index = 1;
+		if (donation.rawAmount > 100) {
+			index = 2;
+		}
+		if (donation.rawAmount > 500) {
+			index = 3;
+		}
+		setCoinProps((prevProps) => [...prevProps, { index: index, left, top, collected: false }]);
 	});
 
 	useEffect(() => {
@@ -74,6 +84,50 @@ function VampireSurvivors(props: ChannelProps) {
 					return { ...bat, top: `${newTop}px` };
 				})
 			  );
+
+			  setCoinProps((prevCoinProps) => {
+				return prevCoinProps.map((coin) => {
+					const middleLeft = 682;
+					// Parse the current left from "###px" to a number
+					const currentLeft = parseInt(coin.left ?? '0', 10);
+					// Move 1 pixel closer to the horizontal center at 546
+					// You can tweak the 1-pixel step, or use a fraction to ease in, etc.
+					let newLeft: number;
+					if (currentLeft < middleLeft + 12 && currentLeft > middleLeft - 12) {
+						newLeft = currentLeft; // already at pseduo-center
+					} else if (currentLeft < middleLeft) {
+						newLeft = currentLeft + 5; // move right
+					} else if (currentLeft > middleLeft) {
+						newLeft = currentLeft - 5; // move left
+					} else {
+						newLeft = currentLeft; // already at center
+					}
+
+					const middleTop = 128;
+					// Parse the current top from "###px" to a number
+					const currentTop = parseInt(coin.top ?? '0', 10);
+					// Move 1 pixel closer to the vertical center at 166
+					// You can tweak the 1-pixel step, or use a fraction to ease in, etc.
+					let newTop: number;
+					if (currentTop < middleTop + 12 && currentTop > middleTop - 12) {
+						newTop = currentTop; // already at pseduo-center
+					} else if (currentTop < middleTop) {
+						newTop = currentTop + 5; // move down
+					} else if (currentTop > middleTop) {
+						newTop = currentTop - 5; // move up
+					} else {
+						newTop = currentTop; // already at center
+					}
+
+					let collected = false;
+					if (newLeft === currentLeft && newTop === currentTop) {
+						collected = true;
+					}
+
+					return { ...coin, left: `${newLeft}px`, top: `${newTop}px`, collected: collected };
+				})
+				.filter((coin) => !coin.collected)
+			});
 		}, 1000 / 30);
 
 		return () => clearInterval(interval);
@@ -85,13 +139,17 @@ function VampireSurvivors(props: ChannelProps) {
 				<TweenNumber value={Math.floor(total?.raw ?? 0)} />
 			</TotalEl>
 
-			<Guy></Guy>
+			<Guy left="640px" top="112px"></Guy>
 
 			{batProps.map((props, index) => (
 				<Bat key={index} {...props}></Bat>
 			))}
+
+			{coinProps.map((props, index) => (
+				<Coin key={index} {...props}></Coin>
+			))}
 			
-			<TotalCoin index={0}></TotalCoin>
+			<Coin index={1} left="1032px" top="8px" collected={false}></Coin>
 		</Container>
 	);
 }
@@ -120,10 +178,4 @@ const TotalEl = styled.div`
 
 	right: 64px;
 	top: 16px;
-`;
-
-const TotalCoin = styled(Coin)`
-	position: absolute;
-	top: 8px;
-	right: 16px;
 `;

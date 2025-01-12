@@ -11,7 +11,7 @@ interface GuyContainerProps {
 
 const GuyContainer = styled.div<GuyContainerProps>`
     position: absolute;
-    left: ${props => props.left || '45%'};
+    left: ${props => props.left || '50%'};
     top: ${props => props.top || '35%'};
     width: 101px;
     height: 104px;
@@ -21,7 +21,13 @@ const GuyContainer = styled.div<GuyContainerProps>`
     background-position: ${props => `-${props.frameX * 101}px 0`};
 `;
 
-function Guy() {
+interface GuyProps {
+    left?: string;
+    top?: string;
+}
+
+
+function Guy({left, top}: GuyProps) {
     const [frame, setFrame] = useState(0);
 
     useEffect(() => {
@@ -33,7 +39,7 @@ function Guy() {
     }, []);
 
     return (
-        <GuyContainer sprite={guySprite} frameX={frame} />
+        <GuyContainer sprite={guySprite} frameX={frame} left={left} top={top} />
     );
 }
 

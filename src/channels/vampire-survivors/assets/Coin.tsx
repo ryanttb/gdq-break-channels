@@ -4,9 +4,14 @@ import coinsSprite from './coins.png';
 interface CoinContainerProps {
   sprite: string;
   index: number;
+  left?: string;
+  top?: string;
 }
 
 const CoinContainer = styled.div<CoinContainerProps>`
+  position: absolute;
+  left: ${props => props.left || '45%'};
+  top: ${props => props.top || '35%'};
   width: 38px;
   height: 38px;
   background-image: url(${props => props.sprite});
@@ -22,8 +27,13 @@ interface CoinProps {
    */
   index?: number;
   className?: string;
+  left?: string;
+  top?: string;
+  collected: boolean;
 }
 
-export default function Coin({ index = 0, className }: CoinProps) {
-  return <CoinContainer sprite={coinsSprite} index={index} className={className} />;
+export { CoinProps };
+
+export default function Coin({ index = 0, className, left, top }: CoinProps) {
+  return <CoinContainer sprite={coinsSprite} index={index} className={className} left={left} top={top} />;
 }
