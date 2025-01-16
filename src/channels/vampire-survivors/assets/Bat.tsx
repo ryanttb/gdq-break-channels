@@ -24,6 +24,7 @@ const BatContainer = styled.div<BatContainerProps>`
 interface BatProps {
   left?: string;
   top?: string;
+  collected: boolean;
 }
 
 function Bat({ left, top }: BatProps) {
