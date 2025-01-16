@@ -2,7 +2,7 @@
  * @author Ryan Morrison-Westphal <mr.tyzik@gmail.com>
  */
 
-import type { FormattedDonation, Total } from '@gdq/types/tracker';
+import type { FormattedDonation, Total, TwitchSubscription } from '@gdq/types/tracker';
 import { ChannelProps, registerChannel } from '../channels';
 
 import { useListenFor, useReplicant } from 'use-nodecg';
@@ -14,6 +14,7 @@ import background from './background.png';
 import Guy from './assets/Guy';
 import Bat, { type BatProps } from './assets/Bat';
 import Coin, {type CoinProps } from './assets/Coin';
+import Whip, {type WhipProps } from './assets/Whip';
 import { useEffect, useState } from 'react';
 
 registerChannel('Vampire Survivors', 23, VampireSurvivors, {
@@ -30,6 +31,8 @@ function VampireSurvivors(props: ChannelProps) {
 	const [batProps, setBatProps] = useState<BatProps[]>([]);
 
 	const [coinProps, setCoinProps] = useState<CoinProps[]>([]);
+
+	const [whipProps, setWhipProps] = useState<WhipProps[]>([]);
 
 	useListenFor('donation', (donation: FormattedDonation) => {
 		const maxLeft = 1092;
@@ -51,13 +54,33 @@ function VampireSurvivors(props: ChannelProps) {
 
 		//setBatProps((prevProps) => [...prevProps, { left, top }]);
 		let index = 1;
-		if (donation.rawAmount > 100) {
+		if (donation.rawAmount > 20) {
 			index = 2;
 		}
-		if (donation.rawAmount > 500) {
+		if (donation.rawAmount > 200) {
 			index = 3;
 		}
 		setCoinProps((prevProps) => [...prevProps, { index: index, left, top, collected: false }]);
+	});
+
+	useListenFor('subscription', (subscription: TwitchSubscription) => {
+		const maxTop = 332;
+
+		const middleTop = 128;
+
+		let leftValue = -80;
+		let topValue = Math.floor(Math.random() * (maxTop + 1));
+
+		if (topValue < middleTop) {
+			topValue -= middleTop;
+		} else {
+			topValue += middleTop;
+		}
+
+		const left = leftValue + 'px';
+		const top = topValue + 'px';
+
+		setBatProps((prevProps) => [...prevProps, { left, top, collected: false }]);
 	});
 
 	useEffect(() => {
@@ -66,24 +89,37 @@ function VampireSurvivors(props: ChannelProps) {
 
 			setBatProps((prevBatProps) =>
 				prevBatProps.map((bat) => {
+					const middleLeft = 500;
 					const middleTop = 128;
-					// Parse the current top from "###px" to a number
+
+					// Current positions
+					const currentLeft = parseInt(bat.left ?? '0', 10);
 					const currentTop = parseInt(bat.top ?? '0', 10);
-					// Move 1 pixel closer to the vertical center at 166
-					// You can tweak the 1-pixel step, or use a fraction to ease in, etc.
-					let newTop: number;
-					if (currentTop < middleTop + 20 && currentTop > middleTop - 20) {
-						newTop = currentTop; // already at pseduo-center
-					} else if (currentTop < middleTop) {
-						newTop = currentTop + 2; // move down
-					} else if (currentTop > middleTop) {
-						newTop = currentTop - 2; // move up
-					} else {
-						newTop = currentTop; // already at center
+
+					// Distance from coin to Guy
+					const dx = middleLeft - currentLeft;
+					const dy = middleTop - currentTop;
+
+					const fraction = 0.05;
+
+					const newLeft = currentLeft + dx * fraction;
+					const newTop = currentTop + dy * fraction;
+
+					const distance = Math.sqrt(dx * dx + dy * dy);
+					const collected = distance < 40;
+
+					if (collected) {
+						setWhipProps((prevWhipProps) => [...prevWhipProps, { left: `112px`, top: `112px`, done: false }]);
 					}
-					return { ...bat, top: `${newTop}px` };
+
+					return { ...bat, left: `${newLeft}px`, top: `${newTop}px`, collected: collected };
 				})
+				.filter((bat) => !bat.collected)
 			  );
+
+			setWhipProps((prevWhipProps) =>
+				prevWhipProps.filter((whip) => !whip.done)
+			);
 
 			  setCoinProps((prevCoinProps) => {
 				return prevCoinProps.map((coin) => {
@@ -126,6 +162,10 @@ function VampireSurvivors(props: ChannelProps) {
 
 			{batProps.map((props, index) => (
 				<Bat key={index} {...props}></Bat>
+			))}
+
+			{whipProps.map((props, index) => (
+				<Whip key={index} {...props}></Whip>
 			))}
 
 			{coinProps.map((props, index) => (
