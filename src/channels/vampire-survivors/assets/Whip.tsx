@@ -1,6 +1,5 @@
 import styled from '@emotion/styled';
 import whipSprite from './whip.png';
-import { useEffect, useState } from 'react';
 
 interface WhipContainerProps {
     sprite: string;
@@ -24,24 +23,11 @@ const WhipContainer = styled.div<WhipContainerProps>`
 interface WhipProps {
   left?: string;
   top?: string;
+  frame: number
   done: boolean;
 }
 
-function Whip({ left, top, done }: WhipProps) {
-    const [frame, setFrame] = useState(0);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setFrame(prevFrame => (prevFrame + 1) % 4);
-            if (frame === 0) {
-                clearInterval(interval);
-                done = true;
-            }
-        }, 75);
-
-        return () => clearInterval(interval);
-    }, []);
-
+function Whip({ left, top, frame }: WhipProps) {
     return (
         <WhipContainer sprite={whipSprite} frameX={frame} left={left} top={top} />
     );

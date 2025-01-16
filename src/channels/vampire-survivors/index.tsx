@@ -83,6 +83,20 @@ function VampireSurvivors(props: ChannelProps) {
 		setBatProps((prevProps) => [...prevProps, { left, top, collected: false }]);
 	});
 
+    useEffect(() => {
+        const interval = setInterval(() => {
+			setWhipProps((prevWhipProps) => 
+				prevWhipProps.map((whip) => {
+					whip.frame = (whip.frame + 1) % 4;
+					return { ...whip, done: whip.frame === 0 };
+				})
+				.filter((whip) => !whip.done)
+			);
+        }, 75);
+
+        return () => clearInterval(interval);
+    }, []);
+
 	useEffect(() => {
 		const interval = setInterval(() => {
 			setBgOffset((prevOffset) => (prevOffset - 4) % 1092);
@@ -109,7 +123,7 @@ function VampireSurvivors(props: ChannelProps) {
 					const collected = distance < 40;
 
 					if (collected) {
-						setWhipProps((prevWhipProps) => [...prevWhipProps, { left: `112px`, top: `112px`, done: false }]);
+						setWhipProps((prevWhipProps) => [...prevWhipProps, { left: `112px`, top: `112px`, frame: 0, done: false }]);
 					}
 
 					return { ...bat, left: `${newLeft}px`, top: `${newTop}px`, collected: collected };
