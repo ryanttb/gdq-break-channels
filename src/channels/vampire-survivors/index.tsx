@@ -18,7 +18,7 @@ import Guy from './assets/Guy';
 import Bat, { type BatProps } from './assets/Bat';
 import Coin, { type CoinProps } from './assets/Coin';
 import Whip, { type WhipProps } from './assets/Whip';
-import Sub from './assets/Sub';
+import Sub, {type SubProps } from './assets/Sub';
 import EventBar from './assets/EventBar';
 
 registerChannel('Vampire Survivors', 23, VampireSurvivors, {
@@ -39,6 +39,8 @@ function VampireSurvivors(props: ChannelProps) {
 	const [coinProps, setCoinProps] = useState<CoinProps[]>([]);
 
 	const [whipProps, setWhipProps] = useState<WhipProps[]>([]);
+
+	const [subProps, setSubProps] = useState<SubProps[]>([]);
 
 	useListenFor('donation', (donation: FormattedDonation) => {
 		const maxLeft = 1092;
@@ -86,6 +88,8 @@ function VampireSurvivors(props: ChannelProps) {
 		const top = topValue + 'px';
 
 		setBatProps((prevProps) => [...prevProps, { left, top, collected: false }]);
+
+		setSubProps((prevProps) => [...prevProps, { subPlan: subscription.sub_plan, displayName: subscription.display_name }]);
 	});
 
 	useEffect(() => {
@@ -193,7 +197,9 @@ function VampireSurvivors(props: ChannelProps) {
 				<Coin key={index} {...props}></Coin>
 			))}
 
-			<Sub left="16px" top="140px"></Sub>
+			{subProps.length > 0 && (
+				<Sub left="16px" top="140px" subPlan={subProps[0].subPlan} displayName={subProps[0].displayName}></Sub>
+			)}
 
 			<Coin index={1} left="1032px" top="52px" collected={false}></Coin>
 		</Container>
