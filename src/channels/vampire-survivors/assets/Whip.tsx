@@ -20,7 +20,7 @@ const WhipContainer = styled.div<WhipContainerProps>`
     background-position: ${props => `-${props.frameX * 523}px 0`};
 `;
 
-interface WhipProps {
+export interface WhipProps {
   left?: string;
   top?: string;
   frame: number
@@ -32,7 +32,5 @@ function Whip({ left, top, frame }: WhipProps) {
         <WhipContainer sprite={whipSprite} frameX={frame} left={left} top={top} />
     );
 }
-
-export { WhipProps };
 
 export default Whip;

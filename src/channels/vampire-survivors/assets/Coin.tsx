@@ -19,11 +19,11 @@ const CoinContainer = styled.div<CoinContainerProps>`
   background-position: ${props => `-${props.index * 38}px 0`};
 `;
 
-interface CoinProps {
+export interface CoinProps {
   /** 
    * index determines which coin to show:
    * 0 -> first coin (gold), 
-   * 1 -> second coin, etc.
+   * 1 -> green gem, etc.
    */
   index?: number;
   className?: string;
@@ -31,8 +31,6 @@ interface CoinProps {
   top?: string;
   collected: boolean;
 }
-
-export { CoinProps };
 
 export default function Coin({ index = 0, className, left, top }: CoinProps) {
   return <CoinContainer sprite={coinsSprite} index={index} className={className} left={left} top={top} />;
