@@ -173,10 +173,7 @@ function VampireSurvivors(props: ChannelProps) {
 
 	return (
 		<Container posX={bgOffset}>
-			<CurrentEventName>{event?.name}</CurrentEventName>
-			<CurrentEventBeneficiary>{event?.beneficiary}</CurrentEventBeneficiary>
-
-			<EventBar left="0px" top="0px"></EventBar>
+			<EventBar left="0px" top="0px" eventBeneficiary={event?.beneficiary} eventName={event?.shortname}></EventBar>
 
 			<TotalEl>
 				<TweenNumber value={Math.floor(total?.raw ?? 0)} />
@@ -218,35 +215,13 @@ const Container = styled.div<ContainerProps>`
 	margin: 0;
 `;
 
-const CurrentEventName = styled.div`
-	font-family: gdqpixel;
-	font-size: 18px;
-	color: white;
-
-	position: absolute;
-
-	left: 16px;
-	top: 104px;
-`;
-
-const CurrentEventBeneficiary = styled.div`
-	font-family: gdqpixel;
-	font-size: 18px;
-	color: white;
-
-	position: absolute;
-
-	left: 16px;
-	top: 222px;
-`;
-
 const TotalEl = styled.div`
 	font-family: gdqpixel;
-	font-size: 18px;
+	font-size: 25px;
 	color: white;
 
 	position: absolute;
 
 	right: 64px;
-	top: 62px;
+	top: 58px;
 `;
