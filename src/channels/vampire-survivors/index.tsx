@@ -2,10 +2,13 @@
  * @author Ryan Morrison-Westphal <mr.tyzik@gmail.com>
  */
 
-import type { FormattedDonation, Total, TwitchSubscription } from '@gdq/types/tracker';
+import type { FormattedDonation, Event, Total, TwitchSubscription } from '@gdq/types/tracker';
 import { ChannelProps, registerChannel } from '../channels';
 
-import { useListenFor, useReplicant } from 'use-nodecg';
+import { useEffect, useState } from 'react';
+
+import { useListenFor } from 'use-nodecg';
+import { usePreloadedReplicant } from '@gdq/lib/hooks/usePreloadedReplicant';
 import styled from '@emotion/styled';
 import TweenNumber from '@gdq/lib/components/TweenNumber';
 
@@ -13,9 +16,10 @@ import background from './background.png';
 
 import Guy from './assets/Guy';
 import Bat, { type BatProps } from './assets/Bat';
-import Coin, {type CoinProps } from './assets/Coin';
-import Whip, {type WhipProps } from './assets/Whip';
-import { useEffect, useState } from 'react';
+import Coin, { type CoinProps } from './assets/Coin';
+import Whip, { type WhipProps } from './assets/Whip';
+import Sub from './assets/Sub';
+import EventBar from './assets/EventBar';
 
 registerChannel('Vampire Survivors', 23, VampireSurvivors, {
 	position: 'bottomLeft',
@@ -24,7 +28,9 @@ registerChannel('Vampire Survivors', 23, VampireSurvivors, {
 });
 
 function VampireSurvivors(props: ChannelProps) {
-	const [total] = useReplicant<Total | null>('total', null);
+	const [event] = usePreloadedReplicant<Event>('currentEvent');
+
+	const [total] = usePreloadedReplicant<Total | null>('total', null);
 
 	const [bgOffset, setBgOffset] = useState(0);
 
@@ -52,7 +58,6 @@ function VampireSurvivors(props: ChannelProps) {
 		const left = leftValue + 'px';
 		const top = topValue + 'px';
 
-		//setBatProps((prevProps) => [...prevProps, { left, top }]);
 		let index = 1;
 		if (donation.rawAmount > 20) {
 			index = 2;
@@ -83,19 +88,19 @@ function VampireSurvivors(props: ChannelProps) {
 		setBatProps((prevProps) => [...prevProps, { left, top, collected: false }]);
 	});
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-			setWhipProps((prevWhipProps) => 
+	useEffect(() => {
+		const interval = setInterval(() => {
+			setWhipProps((prevWhipProps) =>
 				prevWhipProps.map((whip) => {
 					whip.frame = (whip.frame + 1) % 4;
 					return { ...whip, done: whip.frame === 0 };
 				})
-				.filter((whip) => !whip.done)
+					.filter((whip) => !whip.done)
 			);
-        }, 75);
+		}, 75);
 
-        return () => clearInterval(interval);
-    }, []);
+		return () => clearInterval(interval);
+	}, []);
 
 	useEffect(() => {
 		const interval = setInterval(() => {
@@ -128,14 +133,14 @@ function VampireSurvivors(props: ChannelProps) {
 
 					return { ...bat, left: `${newLeft}px`, top: `${newTop}px`, collected: collected };
 				})
-				.filter((bat) => !bat.collected)
-			  );
+					.filter((bat) => !bat.collected)
+			);
 
 			setWhipProps((prevWhipProps) =>
 				prevWhipProps.filter((whip) => !whip.done)
 			);
 
-			  setCoinProps((prevCoinProps) => {
+			setCoinProps((prevCoinProps) => {
 				return prevCoinProps.map((coin) => {
 					const middleLeft = 682;
 					const middleTop = 128;
@@ -159,7 +164,7 @@ function VampireSurvivors(props: ChannelProps) {
 
 					return { ...coin, left: `${newLeft}px`, top: `${newTop}px`, collected: collected };
 				})
-				.filter((coin) => !coin.collected)
+					.filter((coin) => !coin.collected)
 			});
 		}, 1000 / 30);
 
@@ -168,6 +173,11 @@ function VampireSurvivors(props: ChannelProps) {
 
 	return (
 		<Container posX={bgOffset}>
+			<CurrentEventName>{event?.name}</CurrentEventName>
+			<CurrentEventBeneficiary>{event?.beneficiary}</CurrentEventBeneficiary>
+
+			<EventBar left="0px" top="0px"></EventBar>
+
 			<TotalEl>
 				<TweenNumber value={Math.floor(total?.raw ?? 0)} />
 			</TotalEl>
@@ -185,8 +195,10 @@ function VampireSurvivors(props: ChannelProps) {
 			{coinProps.map((props, index) => (
 				<Coin key={index} {...props}></Coin>
 			))}
-			
-			<Coin index={1} left="1032px" top="8px" collected={false}></Coin>
+
+			<Sub left="16px" top="140px"></Sub>
+
+			<Coin index={1} left="1032px" top="52px" collected={false}></Coin>
 		</Container>
 	);
 }
@@ -206,13 +218,35 @@ const Container = styled.div<ContainerProps>`
 	margin: 0;
 `;
 
+const CurrentEventName = styled.div`
+	font-family: gdqpixel;
+	font-size: 18px;
+	color: white;
+
+	position: absolute;
+
+	left: 16px;
+	top: 104px;
+`;
+
+const CurrentEventBeneficiary = styled.div`
+	font-family: gdqpixel;
+	font-size: 18px;
+	color: white;
+
+	position: absolute;
+
+	left: 16px;
+	top: 222px;
+`;
+
 const TotalEl = styled.div`
 	font-family: gdqpixel;
-	font-size: 24px;
+	font-size: 18px;
 	color: white;
 
 	position: absolute;
 
 	right: 64px;
-	top: 16px;
+	top: 62px;
 `;

@@ -21,7 +21,7 @@ const BatContainer = styled.div<BatContainerProps>`
     background-position: ${props => `-${props.frameX * 80}px 0`};
 `;
 
-interface BatProps {
+export interface BatProps {
   left?: string;
   top?: string;
   collected: boolean;
@@ -42,7 +42,5 @@ function Bat({ left, top }: BatProps) {
         <BatContainer sprite={batSprite} frameX={frame} left={left} top={top} />
     );
 }
-
-export { BatProps };
 
 export default Bat;
