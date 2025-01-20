@@ -89,11 +89,13 @@ function VampireSurvivors(props: ChannelProps) {
 
 		setBatProps((prevProps) => [...prevProps, { left, top, collected: false }]);
 
-		setSubProps((prevProps) => [...prevProps, { subPlan: subscription.sub_plan, displayName: subscription.display_name }]);
+		setSubProps((prevProps) => [...prevProps, { height: '0px', tick: 0, subPlan: subscription.sub_plan, displayName: subscription.display_name }]);
 	});
 
 	useEffect(() => {
 		const interval = setInterval(() => {
+			setBgOffset((prevOffset) => (prevOffset - 4) % 1092);
+
 			setWhipProps((prevWhipProps) =>
 				prevWhipProps.map((whip) => {
 					whip.frame = (whip.frame + 1) % 4;
@@ -101,14 +103,19 @@ function VampireSurvivors(props: ChannelProps) {
 				})
 					.filter((whip) => !whip.done)
 			);
-		}, 75);
 
-		return () => clearInterval(interval);
-	}, []);
+			setSubProps((prevSubProps) => {
+				const maxHeight = 64;
 
-	useEffect(() => {
-		const interval = setInterval(() => {
-			setBgOffset((prevOffset) => (prevOffset - 4) % 1092);
+				if (prevSubProps.length > 0) {
+					const currentHeight = parseInt(prevSubProps[0].height ?? '0', 10);
+					const newHeight = Math.min(currentHeight + 8, maxHeight);
+					prevSubProps[0].height = `${newHeight}px`;
+					prevSubProps[0].tick = prevSubProps[0].tick + 1;
+				}
+
+				return prevSubProps.filter((sub) => sub.tick < maxHeight*2);
+			});
 
 			setBatProps((prevBatProps) =>
 				prevBatProps.map((bat) => {
@@ -198,7 +205,7 @@ function VampireSurvivors(props: ChannelProps) {
 			))}
 
 			{subProps.length > 0 && (
-				<Sub left="16px" top="140px" subPlan={subProps[0].subPlan} displayName={subProps[0].displayName}></Sub>
+				<Sub left="16px" top="140px" tick={subProps[0].tick} height={subProps[0].height} subPlan={subProps[0].subPlan} displayName={subProps[0].displayName}></Sub>
 			)}
 
 			<Coin index={1} left="1032px" top="52px" collected={false}></Coin>
