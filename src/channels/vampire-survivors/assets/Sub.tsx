@@ -4,6 +4,7 @@ import subSprite from './sub.png';
 interface SubContainerProps {
   left?: string;
   top?: string;
+  height?: string;
 }
 
 const SubContainer = styled.div<SubContainerProps>`
@@ -11,10 +12,11 @@ const SubContainer = styled.div<SubContainerProps>`
     left: ${props => props.left || '45%'};
     top: ${props => props.top || '35%' };
     width: 320px;
-    height: 64px;
+    height: ${props => props.height || '64px'};
 	font-family: gdqpixel;
     background-image: url(${subSprite});
     background-repeat: no-repeat;
+    overflow: hidden;
 `;
 
 const SubPlan = styled.span`
@@ -39,14 +41,31 @@ const SubDisplayName = styled.span`
 export interface SubProps {
     left?: string;
     top?: string;
+    height?: string;
+    tick: number;
     subPlan?: string;
     displayName?: string;
 }
 
-export default function Sub({ left, top, subPlan, displayName }: SubProps) {
+function planToName(plan: string): string {
+    switch (plan) {
+        case '1000':
+            return 'Tier 1';
+        case '2000':
+            return 'Tier 2';
+        case '3000':
+            return 'Tier 3';
+        case 'Prime':
+            return 'Prime';
+        default:
+            return '';
+    }
+}
+
+export default function Sub({ left, top, height, subPlan, displayName }: SubProps) {
     return (
-        <SubContainer left={left} top={top}>
-            <SubPlan>{subPlan}</SubPlan>
+        <SubContainer left={left} top={top} height={height}>
+            <SubPlan>{planToName(subPlan ? subPlan : '')}</SubPlan>
             <SubDisplayName>{displayName}</SubDisplayName>
         </SubContainer>
     );
