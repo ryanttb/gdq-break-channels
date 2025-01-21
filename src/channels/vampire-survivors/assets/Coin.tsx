@@ -1,4 +1,4 @@
-import styled from '@emotion/styled'
+import styled from '@emotion/styled';
 import coinsSprite from './coins.png';
 
 interface CoinContainerProps {
@@ -10,19 +10,19 @@ interface CoinContainerProps {
 
 const CoinContainer = styled.div<CoinContainerProps>`
 	position: absolute;
-	left: ${props => props.left || '45%'};
-	top: ${props => props.top || '35%'};
+	left: ${(props) => props.left || '45%'};
+	top: ${(props) => props.top || '35%'};
 	width: 38px;
 	height: 38px;
-	background-image: url(${props => props.sprite});
+	background-image: url(${(props) => props.sprite});
 	background-repeat: no-repeat;
-	background-position: ${props => `-${props.index * 38}px 0`};
+	background-position: ${(props) => `-${props.index * 38}px 0`};
 `;
 
 export interface CoinProps {
-	/** 
+	/**
 	 * index determines which coin to show:
-	 * 0 -> first coin (gold), 
+	 * 0 -> first coin (gold),
 	 * 1 -> green gem, etc.
 	 */
 	index?: number;

@@ -9,10 +9,10 @@ interface SubContainerProps {
 
 const SubContainer = styled.div<SubContainerProps>`
 	position: absolute;
-	left: ${props => props.left || '45%'};
-	top: ${props => props.top || '35%' };
+	left: ${(props) => props.left || '45%'};
+	top: ${(props) => props.top || '35%'};
 	width: 320px;
-	height: ${props => props.height || '64px'};
+	height: ${(props) => props.height || '64px'};
 	font-family: gdqpixel;
 	background-image: url(${subSprite});
 	background-repeat: no-repeat;
