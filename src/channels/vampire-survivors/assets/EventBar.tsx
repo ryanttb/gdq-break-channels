@@ -8,8 +8,8 @@ interface EventBarContainerProps {
 
 const EventBarContainer = styled.div<EventBarContainerProps>`
 	position: absolute;
-	left: ${props => props.left || '45%'};
-	top: ${props => props.top || '35%' };
+	left: ${(props) => props.left || '45%'};
+	top: ${(props) => props.top || '35%'};
 	width: 100%;
 	height: 48px;
 	background-image: url(${eventSprite});

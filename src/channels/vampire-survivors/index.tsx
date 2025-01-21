@@ -91,7 +91,10 @@ function VampireSurvivors(props: ChannelProps) {
 
 		setBatProps((prevProps) => [...prevProps, { left, top, sprite: batSprite, collected: false }]);
 
-		setSubProps((prevProps) => [...prevProps, { height: '0px', tick: 0, subPlan: subscription.sub_plan, displayName: subscription.display_name }]);
+		setSubProps((prevProps) => [
+			...prevProps,
+			{ height: '0px', tick: 0, subPlan: subscription.sub_plan, displayName: subscription.display_name },
+		]);
 	});
 
 	useEffect(() => {
@@ -99,17 +102,18 @@ function VampireSurvivors(props: ChannelProps) {
 			setBgOffset((prevOffset) => (prevOffset - 4) % 1092);
 
 			setWhipProps((prevWhipProps) =>
-				prevWhipProps.map((whip) => {
-					whip.frame = (whip.frame + 1) % 4;
-					return { ...whip, done: whip.frame === 0 };
-				})
-					.filter((whip) => !whip.done)
+				prevWhipProps
+					.map((whip) => {
+						whip.frame = (whip.frame + 1) % 4;
+						return { ...whip, done: whip.frame === 0 };
+					})
+					.filter((whip) => !whip.done),
 			);
 
 			setSubProps((prevSubProps) => {
 				const maxHeight = 64;
 				const maxTicks = 128;
-				const fadeOutTicks = maxTicks * 3 / 4;
+				const fadeOutTicks = (maxTicks * 3) / 4;
 
 				if (prevSubProps.length > 0) {
 					const currentHeight = parseInt(prevSubProps[0].height ?? '0', 10);
@@ -129,64 +133,67 @@ function VampireSurvivors(props: ChannelProps) {
 			});
 
 			setBatProps((prevBatProps) =>
-				prevBatProps.map((bat) => {
-					const middleLeft = 500;
-					const middleTop = 128;
+				prevBatProps
+					.map((bat) => {
+						const middleLeft = 500;
+						const middleTop = 128;
 
-					// Current positions
-					const currentLeft = parseInt(bat.left ?? '0', 10);
-					const currentTop = parseInt(bat.top ?? '0', 10);
+						// Current positions
+						const currentLeft = parseInt(bat.left ?? '0', 10);
+						const currentTop = parseInt(bat.top ?? '0', 10);
 
-					// Distance from coin to Guy
-					const dx = middleLeft - currentLeft;
-					const dy = middleTop - currentTop;
+						// Distance from coin to Guy
+						const dx = middleLeft - currentLeft;
+						const dy = middleTop - currentTop;
 
-					const fraction = 0.05;
+						const fraction = 0.05;
 
-					const newLeft = currentLeft + dx * fraction;
-					const newTop = currentTop + dy * fraction;
+						const newLeft = currentLeft + dx * fraction;
+						const newTop = currentTop + dy * fraction;
 
-					const distance = Math.sqrt(dx * dx + dy * dy);
-					const collected = distance < 40;
+						const distance = Math.sqrt(dx * dx + dy * dy);
+						const collected = distance < 40;
 
-					if (collected) {
-						setWhipProps((prevWhipProps) => [...prevWhipProps, { left: `112px`, top: `112px`, frame: 0, done: false }]);
-					}
+						if (collected) {
+							setWhipProps((prevWhipProps) => [
+								...prevWhipProps,
+								{ left: `112px`, top: `112px`, frame: 0, done: false },
+							]);
+						}
 
-					return { ...bat, left: `${newLeft}px`, top: `${newTop}px`, collected: collected };
-				})
-					.filter((bat) => !bat.collected)
+						return { ...bat, left: `${newLeft}px`, top: `${newTop}px`, collected: collected };
+					})
+					.filter((bat) => !bat.collected),
 			);
 
-			setWhipProps((prevWhipProps) =>
-				prevWhipProps.filter((whip) => !whip.done)
-			);
+			setWhipProps((prevWhipProps) => prevWhipProps.filter((whip) => !whip.done));
 
 			setCoinProps((prevCoinProps) => {
-				return prevCoinProps.map((coin) => {
-					const middleLeft = 682;
-					const middleTop = 128;
+				return prevCoinProps
+					.map((coin) => {
+						const middleLeft = 682;
+						const middleTop = 128;
 
-					// Current positions
-					const currentLeft = parseInt(coin.left ?? '0', 10);
-					const currentTop = parseInt(coin.top ?? '0', 10);
+						// Current positions
+						const currentLeft = parseInt(coin.left ?? '0', 10);
+						const currentTop = parseInt(coin.top ?? '0', 10);
 
-					// Distance from coin to Guy
-					const dx = middleLeft - currentLeft;
-					const dy = middleTop - currentTop;
+						// Distance from coin to Guy
+						const dx = middleLeft - currentLeft;
+						const dy = middleTop - currentTop;
 
-					const fraction = 0.1;
+						const fraction = 0.1;
 
-					const newLeft = currentLeft + dx * fraction;
-					const newTop = currentTop + dy * fraction;
+						const newLeft = currentLeft + dx * fraction;
+						const newTop = currentTop + dy * fraction;
 
-					// If distance is less than 20 pixels, mark as collected
-					const distance = Math.sqrt(dx * dx + dy * dy);
-					const collected = distance < 20;
+						// If distance is less than 20 pixels, mark as collected
+						const distance = Math.sqrt(dx * dx + dy * dy);
+						const collected = distance < 20;
 
-					return { ...coin, left: `${newLeft}px`, top: `${newTop}px`, collected: collected };
-				})
-					.filter((coin) => !coin.collected)
+						return { ...coin, left: `${newLeft}px`, top: `${newTop}px`, collected: collected };
+					})
+					.filter((coin) => !coin.collected);
 			});
 		}, 1000 / 30);
 
@@ -195,7 +202,11 @@ function VampireSurvivors(props: ChannelProps) {
 
 	return (
 		<Container posX={bgOffset}>
-			<EventBar left="0px" top="0px" eventBeneficiary={event?.beneficiary} eventName={event?.shortname}></EventBar>
+			<EventBar
+				left="0px"
+				top="0px"
+				eventBeneficiary={event?.beneficiary}
+				eventName={event?.shortname}></EventBar>
 
 			<TotalEl>
 				<TweenNumber value={Math.floor(total?.raw ?? 0)} />
@@ -216,7 +227,13 @@ function VampireSurvivors(props: ChannelProps) {
 			))}
 
 			{subProps.length > 0 && (
-				<Sub left="16px" top="140px" tick={subProps[0].tick} height={subProps[0].height} subPlan={subProps[0].subPlan} displayName={subProps[0].displayName}></Sub>
+				<Sub
+					left="16px"
+					top="140px"
+					tick={subProps[0].tick}
+					height={subProps[0].height}
+					subPlan={subProps[0].subPlan}
+					displayName={subProps[0].displayName}></Sub>
 			)}
 
 			<Coin index={1} left="1032px" top="52px" collected={false}></Coin>
