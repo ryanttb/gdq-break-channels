@@ -2,14 +2,14 @@ import styled from '@emotion/styled';
 import batSprite from './bat.png';
 import { useEffect, useState } from 'react';
 
-interface BatContainerProps {
+interface EnemyContainerProps {
     sprite: string;
     frameX: number;
     left?: string;
     top?: string;
 }
 
-const BatContainer = styled.div<BatContainerProps>`
+const EnemyContainer = styled.div<EnemyContainerProps>`
     position: absolute;
     left: ${props => props.left || '45%'};
     top: ${props => props.top || '35%'};
@@ -21,13 +21,14 @@ const BatContainer = styled.div<BatContainerProps>`
     background-position: ${props => `-${props.frameX * 80}px 0`};
 `;
 
-export interface BatProps {
+export interface EnemyProps {
   left?: string;
   top?: string;
+  sprite?: string;
   collected: boolean;
 }
 
-function Bat({ left, top }: BatProps) {
+function Enemy({ left, top, sprite }: EnemyProps) {
     const [frame, setFrame] = useState(0);
 
     useEffect(() => {
@@ -39,8 +40,8 @@ function Bat({ left, top }: BatProps) {
     }, []);
 
     return (
-        <BatContainer sprite={batSprite} frameX={frame} left={left} top={top} />
+        <EnemyContainer sprite={sprite || batSprite} frameX={frame} left={left} top={top} />
     );
 }
 
-export default Bat;
+export default Enemy;

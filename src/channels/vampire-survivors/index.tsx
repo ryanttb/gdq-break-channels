@@ -15,11 +15,13 @@ import TweenNumber from '@gdq/lib/components/TweenNumber';
 import background from './background.png';
 
 import Guy from './assets/Guy';
-import Bat, { type BatProps } from './assets/Bat';
+import Enemy, { type EnemyProps } from './assets/Enemy';
 import Coin, { type CoinProps } from './assets/Coin';
 import Whip, { type WhipProps } from './assets/Whip';
 import Sub, {type SubProps } from './assets/Sub';
 import EventBar from './assets/EventBar';
+
+import batSprite from './assets/bat.png';
 
 registerChannel('Vampire Survivors', 23, VampireSurvivors, {
 	position: 'bottomLeft',
@@ -34,7 +36,7 @@ function VampireSurvivors(props: ChannelProps) {
 
 	const [bgOffset, setBgOffset] = useState(0);
 
-	const [batProps, setBatProps] = useState<BatProps[]>([]);
+	const [batProps, setBatProps] = useState<EnemyProps[]>([]);
 
 	const [coinProps, setCoinProps] = useState<CoinProps[]>([]);
 
@@ -87,7 +89,7 @@ function VampireSurvivors(props: ChannelProps) {
 		const left = leftValue + 'px';
 		const top = topValue + 'px';
 
-		setBatProps((prevProps) => [...prevProps, { left, top, collected: false }]);
+		setBatProps((prevProps) => [...prevProps, { left, top, sprite: batSprite, collected: false }]);
 
 		setSubProps((prevProps) => [...prevProps, { height: '0px', tick: 0, subPlan: subscription.sub_plan, displayName: subscription.display_name }]);
 	});
@@ -202,7 +204,7 @@ function VampireSurvivors(props: ChannelProps) {
 			<Guy left="640px" top="112px"></Guy>
 
 			{batProps.map((props, index) => (
-				<Bat key={index} {...props}></Bat>
+				<Enemy key={index} {...props}></Enemy>
 			))}
 
 			{whipProps.map((props, index) => (
