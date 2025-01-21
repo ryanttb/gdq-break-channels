@@ -18,7 +18,7 @@ import Guy from './assets/Guy';
 import Enemy, { type EnemyProps } from './assets/Enemy';
 import Coin, { type CoinProps } from './assets/Coin';
 import Whip, { type WhipProps } from './assets/Whip';
-import Sub, {type SubProps } from './assets/Sub';
+import Sub, { type SubProps } from './assets/Sub';
 import EventBar from './assets/EventBar';
 
 import batSprite from './assets/bat.png';
@@ -26,7 +26,7 @@ import batSprite from './assets/bat.png';
 registerChannel('Vampire Survivors', 23, VampireSurvivors, {
 	position: 'bottomLeft',
 	site: 'GitHub',
-	handle: 'example',
+	handle: 'ryanttb',
 });
 
 function VampireSurvivors(props: ChannelProps) {
@@ -50,7 +50,7 @@ function VampireSurvivors(props: ChannelProps) {
 
 		const middleTop = 128;
 
-		let leftValue = Math.floor(Math.random() * (maxLeft + 1));
+		const leftValue = Math.floor(Math.random() * (maxLeft + 1));
 		let topValue = Math.floor(Math.random() * (maxTop + 1));
 
 		if (topValue < middleTop) {
@@ -77,7 +77,7 @@ function VampireSurvivors(props: ChannelProps) {
 
 		const middleTop = 128;
 
-		let leftValue = -80;
+		const leftValue = -80;
 		let topValue = Math.floor(Math.random() * (maxTop + 1));
 
 		if (topValue < middleTop) {
