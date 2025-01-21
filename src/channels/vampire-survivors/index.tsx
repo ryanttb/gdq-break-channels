@@ -106,15 +106,24 @@ function VampireSurvivors(props: ChannelProps) {
 
 			setSubProps((prevSubProps) => {
 				const maxHeight = 64;
+				const maxTicks = 128;
+				const fadeOutTicks = maxTicks * 3 / 4;
 
 				if (prevSubProps.length > 0) {
 					const currentHeight = parseInt(prevSubProps[0].height ?? '0', 10);
-					const newHeight = Math.min(currentHeight + 8, maxHeight);
+					let newHeight = currentHeight;
+
+					if (prevSubProps[0].tick < fadeOutTicks) {
+						newHeight = Math.min(currentHeight + 8, maxHeight);
+					} else {
+						newHeight = Math.max(currentHeight - 8, 0);
+					}
+
 					prevSubProps[0].height = `${newHeight}px`;
 					prevSubProps[0].tick = prevSubProps[0].tick + 1;
 				}
 
-				return prevSubProps.filter((sub) => sub.tick < maxHeight*2);
+				return prevSubProps.filter((sub) => sub.tick < maxTicks);
 			});
 
 			setBatProps((prevBatProps) =>
