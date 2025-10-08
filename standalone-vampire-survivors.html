@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vampire Survivors - GDQ Break Channel</title>
+    <style>
+        @font-face {
+            font-family: 'gdqpixel';
+            src: local('Courier New'), local('monospace');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            overflow: hidden;
+            font-family: 'gdqpixel', monospace;
+        }
+        
+        #app {
+            width: 1920px;
+            height: 1080px;
+            position: relative;
+            transform-origin: top left;
+            background: #000;
+            border: 2px solid #fff;
+        }
+        
+        .container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: url('src/channels/vampire-survivors/background.png');
+            background-repeat: repeat-x;
+            background-size: 1092px 100%;
+            background-position: 0 0;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .event-bar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 60px;
+            background: linear-gradient(90deg, rgba(0, 0, 0, 0.9), rgba(20, 20, 40, 0.9));
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 18px;
+            font-weight: bold;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .total {
+            position: absolute;
+            right: 64px;
+            top: 58px;
+            font-family: 'gdqpixel', monospace;
+            font-size: 25px;
+            color: #ffd93d;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 217, 61, 0.3);
+        }
+        
+        .guy {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 101px;
+            height: 104px;
+            background-image: url('src/channels/vampire-survivors/assets/guy.png');
+            background-repeat: no-repeat;
+            background-position: 0 0;
+            z-index: 1000;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .coin {
+            position: absolute;
+            width: 38px;
+            height: 38px;
+            background-image: url('src/channels/vampire-survivors/assets/coins.png');
+            background-repeat: no-repeat;
+            background-position: 0 0;
+            z-index: 500;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        @keyframes coinSpin {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+        
+        .enemy {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-image: url('src/channels/vampire-survivors/assets/bat.png');
+            background-repeat: no-repeat;
+            background-position: 0 0;
+            background-size: contain;
+            animation: enemyFloat 2s ease-in-out infinite;
+            z-index: 500;
+            display: block !important;
+            visibility: visible !important;
+        }
+        
+        @keyframes enemyFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .whip {
+            position: absolute;
+            width: 80px;
+            height: 20px;
+            background-image: url('src/channels/vampire-survivors/assets/whip.png');
+            background-repeat: no-repeat;
+            background-position: 0 0;
+            background-size: contain;
+            animation: whipFlash 0.2s ease-out;
+            z-index: 8;
+        }
+        
+        @keyframes whipFlash {
+            0% { 
+                transform: scaleX(0.5);
+                opacity: 0.5;
+            }
+            50% { 
+                transform: scaleX(1.2);
+                opacity: 1;
+            }
+            100% { 
+                transform: scaleX(1);
+                opacity: 0.8;
+            }
+        }
+        
+        .sub-notification {
+            position: absolute;
+            left: 16px;
+            top: 140px;
+            background: linear-gradient(135deg, rgba(145, 70, 255, 0.9), rgba(180, 100, 255, 0.9));
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(145, 70, 255, 0.5);
+            transition: height 0.1s ease;
+        }
+        
+        .controls {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .controls button {
+            margin: 5px;
+            padding: 8px 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .controls button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <button onclick="simulateDonation()">Test Donation</button>
+        <button onclick="simulateSubscription()">Test Subscription</button>
+        <button onclick="resetGame()">Reset</button>
+    </div>
+    
+    <div id="app">
+        <div class="container" id="container">
+            <div class="event-bar">
+                <span id="event-name">SGDQ2023</span> - <span id="beneficiary">Doctors Without Borders</span>
+            </div>
+            <div class="total" id="total">$0</div>
+            <div class="guy" id="guy"></div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let total = 0;
+        let bgOffset = 0;
+        let coins = [];
+        let enemies = [];
+        let whips = [];
+        let subNotifications = [];
+        
+        // Animation frame
+        let animationId;
+        
+        // Initialize the game
+        function init() {
+            console.log('Initializing game...');
+            
+            // Scale the app to fit the viewport
+            const app = document.getElementById('app');
+            const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+            app.style.transform = `scale(${scale})`;
+            
+            // Check if guy element exists
+            const guy = document.getElementById('guy');
+            console.log('Guy element:', guy);
+            if (guy) {
+                console.log('Guy element found and visible');
+                const styles = window.getComputedStyle(guy);
+                console.log('Guy computed styles:', {
+                    display: styles.display,
+                    visibility: styles.visibility,
+                    opacity: styles.opacity,
+                    background: styles.background,
+                    width: styles.width,
+                    height: styles.height,
+                    left: styles.left,
+                    top: styles.top
+                });
+            } else {
+                console.log('Guy element NOT found!');
+            }
+            
+            // Start the game loop
+            gameLoop();
+        }
+        
+        // Main game loop
+        function gameLoop() {
+            updateBackground();
+            updateCoins();
+            updateEnemies();
+            updateWhips();
+            updateSubNotifications();
+            
+            animationId = requestAnimationFrame(gameLoop);
+        }
+        
+        // Update background scrolling
+        function updateBackground() {
+            bgOffset = (bgOffset - 4) % 1092;
+            document.getElementById('container').style.backgroundPosition = `${bgOffset}px 0`;
+        }
+        
+        // Update coins (move towards guy)
+        function updateCoins() {
+            const guyX = 640 + 32; // Guy center X
+            const guyY = 112 + 32; // Guy center Y
+            
+            coins = coins.filter(coin => {
+                const coinEl = document.getElementById(`coin-${coin.id}`);
+                if (!coinEl) return false;
+                
+                const currentX = parseInt(coin.left);
+                const currentY = parseInt(coin.top);
+                
+                const dx = guyX - currentX;
+                const dy = guyY - currentY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < 20) {
+                    coinEl.remove();
+                    return false; // Remove coin
+                }
+                
+                // Move coin towards guy
+                const newX = currentX + dx * 0.1;
+                const newY = currentY + dy * 0.1;
+                
+                coin.left = newX;
+                coin.top = newY;
+                coinEl.style.left = `${newX}px`;
+                coinEl.style.top = `${newY}px`;
+                
+                return true;
+            });
+        }
+        
+        // Update enemies (move towards guy)
+        function updateEnemies() {
+            const guyX = 640 + 32;
+            const guyY = 112 + 32;
+            
+            enemies = enemies.filter(enemy => {
+                const enemyEl = document.getElementById(`enemy-${enemy.id}`);
+                if (!enemyEl) return false;
+                
+                const currentX = parseInt(enemy.left);
+                const currentY = parseInt(enemy.top);
+                
+                const dx = guyX - currentX;
+                const dy = guyY - currentY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < 40) {
+                    // Create whip effect
+                    createWhip(112, 112);
+                    enemyEl.remove();
+                    return false;
+                }
+                
+                const newX = currentX + dx * 0.05;
+                const newY = currentY + dy * 0.05;
+                
+                enemy.left = newX;
+                enemy.top = newY;
+                enemyEl.style.left = `${newX}px`;
+                enemyEl.style.top = `${newY}px`;
+                
+                return true;
+            });
+        }
+        
+        // Update whip animations
+        function updateWhips() {
+            whips = whips.filter(whip => {
+                whip.frame = (whip.frame + 1) % 4;
+                whip.done = whip.frame === 0;
+                
+                if (whip.done) {
+                    const whipEl = document.getElementById(`whip-${whip.id}`);
+                    if (whipEl) whipEl.remove();
+                    return false;
+                }
+                
+                return true;
+            });
+        }
+        
+        // Update subscription notifications
+        function updateSubNotifications() {
+            subNotifications = subNotifications.filter(sub => {
+                sub.tick++;
+                const maxTicks = 128;
+                const fadeOutTicks = (maxTicks * 3) / 4;
+                const maxHeight = 64;
+                
+                let newHeight;
+                if (sub.tick < fadeOutTicks) {
+                    newHeight = Math.min(parseInt(sub.height) + 8, maxHeight);
+                } else {
+                    newHeight = Math.max(parseInt(sub.height) - 8, 0);
+                }
+                
+                sub.height = `${newHeight}px`;
+                
+                const subEl = document.getElementById(`sub-${sub.id}`);
+                if (subEl) {
+                    subEl.style.height = sub.height;
+                }
+                
+                return sub.tick < maxTicks;
+            });
+        }
+        
+        // Create a coin
+        function createCoin(amount) {
+            console.log('Creating coin with amount:', amount);
+            
+            const maxLeft = 1092;
+            const maxTop = 332;
+            const middleTop = 128;
+            
+            const leftValue = Math.floor(Math.random() * (maxLeft + 1));
+            let topValue = Math.floor(Math.random() * (maxTop + 1));
+            
+            if (topValue < middleTop) {
+                topValue -= middleTop;
+            } else {
+                topValue += middleTop;
+            }
+            
+            const coin = {
+                id: Date.now() + Math.random(),
+                left: leftValue,
+                top: topValue,
+                amount: amount
+            };
+            
+            coins.push(coin);
+            
+            const coinEl = document.createElement('div');
+            coinEl.className = 'coin';
+            coinEl.id = `coin-${coin.id}`;
+            coinEl.style.left = `${coin.left}px`;
+            coinEl.style.top = `${coin.top}px`;
+            
+            // Different coin types based on amount (using sprite frames)
+            let coinIndex = 0; // Default to first coin
+            if (amount > 200) {
+                coinIndex = 2; // Third coin type
+            } else if (amount > 20) {
+                coinIndex = 1; // Second coin type
+            }
+            
+            // Set the sprite frame position
+            coinEl.style.backgroundPosition = `-${coinIndex * 38}px 0`;
+            
+            console.log('Adding coin element to container:', coinEl);
+            document.getElementById('container').appendChild(coinEl);
+        }
+        
+        // Create an enemy
+        function createEnemy() {
+            const maxTop = 332;
+            const middleTop = 128;
+            
+            const leftValue = -80;
+            let topValue = Math.floor(Math.random() * (maxTop + 1));
+            
+            if (topValue < middleTop) {
+                topValue -= middleTop;
+            } else {
+                topValue += middleTop;
+            }
+            
+            const enemy = {
+                id: Date.now() + Math.random(),
+                left: leftValue,
+                top: topValue
+            };
+            
+            enemies.push(enemy);
+            
+            const enemyEl = document.createElement('div');
+            enemyEl.className = 'enemy';
+            enemyEl.id = `enemy-${enemy.id}`;
+            enemyEl.style.left = `${enemy.left}px`;
+            enemyEl.style.top = `${enemy.top}px`;
+            
+            document.getElementById('container').appendChild(enemyEl);
+        }
+        
+        // Create whip effect
+        function createWhip(x, y) {
+            const whip = {
+                id: Date.now() + Math.random(),
+                left: x,
+                top: y,
+                frame: 0,
+                done: false
+            };
+            
+            whips.push(whip);
+            
+            const whipEl = document.createElement('div');
+            whipEl.className = 'whip';
+            whipEl.id = `whip-${whip.id}`;
+            whipEl.style.left = `${whip.left}px`;
+            whipEl.style.top = `${whip.top}px`;
+            
+            document.getElementById('container').appendChild(whipEl);
+        }
+        
+        // Create subscription notification
+        function createSubNotification(displayName, subPlan) {
+            const sub = {
+                id: Date.now() + Math.random(),
+                height: '0px',
+                tick: 0,
+                displayName: displayName,
+                subPlan: subPlan
+            };
+            
+            subNotifications.push(sub);
+            
+            const subEl = document.createElement('div');
+            subEl.className = 'sub-notification';
+            subEl.id = `sub-${sub.id}`;
+            subEl.style.height = sub.height;
+            subEl.textContent = `${displayName} subscribed!`;
+            
+            document.getElementById('container').appendChild(subEl);
+        }
+        
+        // Update total display
+        function updateTotal(amount) {
+            total += amount;
+            document.getElementById('total').textContent = `$${total.toLocaleString()}`;
+        }
+        
+        // Simulate donation
+        function simulateDonation() {
+            const amount = Math.floor(Math.random() * 20000) / 100 + 5;
+            updateTotal(amount);
+            createCoin(amount);
+        }
+        
+        // Simulate subscription
+        function simulateSubscription() {
+            const names = ['TestUser', 'Gamer123', 'SpeedRunner', 'Donator', 'Fan'];
+            const displayName = names[Math.floor(Math.random() * names.length)];
+            const subPlan = ['1000', '2000', '3000', 'Prime'][Math.floor(Math.random() * 4)];
+            
+            createEnemy();
+            createSubNotification(displayName, subPlan);
+        }
+        
+        // Reset game
+        function resetGame() {
+            total = 0;
+            document.getElementById('total').textContent = '$0';
+            
+            // Remove all dynamic elements
+            coins.forEach(coin => {
+                const coinEl = document.getElementById(`coin-${coin.id}`);
+                if (coinEl) coinEl.remove();
+            });
+            enemies.forEach(enemy => {
+                const enemyEl = document.getElementById(`enemy-${enemy.id}`);
+                if (enemyEl) enemyEl.remove();
+            });
+            whips.forEach(whip => {
+                const whipEl = document.getElementById(`whip-${whip.id}`);
+                if (whipEl) whipEl.remove();
+            });
+            subNotifications.forEach(sub => {
+                const subEl = document.getElementById(`sub-${sub.id}`);
+                if (subEl) subEl.remove();
+            });
+            
+            coins = [];
+            enemies = [];
+            whips = [];
+            subNotifications = [];
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const app = document.getElementById('app');
+            const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+            app.style.transform = `scale(${scale})`;
+        });
+        
+        // Initialize when page loads
+        window.addEventListener('load', init);
+        
+        // Auto-simulate some activity for demo purposes
+        setInterval(() => {
+            if (Math.random() < 0.1) { // 10% chance every interval
+                simulateDonation();
+            }
+        }, 2000);
+        
+        setInterval(() => {
+            if (Math.random() < 0.05) { // 5% chance every interval
+                simulateSubscription();
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
